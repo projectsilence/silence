@@ -1,0 +1,8 @@
+[Unit]
+Description=silence socket
+
+[Socket]
+ListenStream=/home/rootfinlay/silence/app/silence_backend/silence.sock
+
+[Install]
+WantedBy=sockets.target

@@ -1,0 +1,11 @@
+server {
+       listen 127.0.0.1:8080 default_server;
+       server_name silence;
+
+       location / {
+         include proxy_params;
+         proxy_pass http://unix:/home/rootfinlay/silence/app/silence_backend/silence.sock;
+         allow 127.0.0.1;
+         deny all;
+       }
+     }
