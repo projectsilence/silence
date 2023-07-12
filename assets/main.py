@@ -10,40 +10,43 @@ def home():
 
 @app.route("/initiate", methods=["POST"])
 def initiate():
-    if 'rpub' not in request.args and 'fpub' not in request.args and 'init' not in request.args and 'oniona' not in request.args:
+    if 'pub1' not in request.args or 'pub2' not in request.args or 'init' not in request.args or 'oniona' not in request.args:
         return "Malformed request.."
+
+    if os.path.exists(request.args['oniona']) == True:
+            return "Contact already initiated.."
 
     os.mkdir(KEY_FOLDER.format(request.args['oniona']))
     os.mkdir(KEY_FOLDER.format(request.args['oniona'])+"messages")
 
+    if request.args['init'] == "1":
+        rpub = request.args['pub1']
+        fpub = request.args['pub2']
+    elif request.args['init'] == "2":
+        rpub = request.args['pub2']
+        fpub = request.args['pub1']
+
     with open((KEY_FOLDER.format(str(request.args['oniona']))+'realpub.pub'), "wb+") as f:
-        f.write(base64.b64decode(request.args['rpub']))
+        f.write(base64.b64decode(rpub))
     f.close()
 
     with open((KEY_FOLDER.format(str(request.args['oniona']))+'fakepub.pub'), "wb+") as f:
-        f.write(base64.b64decode(request.args['fpub']))
+        f.write(base64.b64decode(fpub))
     f.close()
 
-    selfrpub = base64.b64encode(open((SELF_KEY_FOLDER+'selfrsatrue.pub'), "rb").read())
-    selffpub = base64.b64encode(open((SELF_KEY_FOLDER+'selfrsafalse.pub'), "rb").read())
+    with open("./notifications.sil", "a") as f:
+        f.write("New contact:  {}".format(request.args['oniona']))
 
-    return_dict = {
-        'rpub' : selfrpub.decode('utf-8'),
-        'fpub' : selffpub.decode('utf-8'),
-        'init' : 2,
-        'oniona' : SELF_ADDRESS
-    }
-
-    return return_dict
+    return "Contact Initiated!"
 
 @app.route('/sendmessage', methods=["POST"])
 def send_message():
-    if 'message' not in request.args and 'oniona' not in request.args and 'signature' not in request.args:
+    if 'message' not in request.args or 'oniona' not in request.args or 'signature' not in request.args:
         return "Malformed request.."
     
-    mcount = num_files = len([f for f in os.listdir(KEY_FOLDER.format(request.args['oniona'])+"messages")if os.path.isfile(os.path.join(path, f))])
+    mcount = len([f for f in os.listdir(KEY_FOLDER.format(request.args['oniona'])+"messages")if os.path.isfile(os.path.join(KEY_FOLDER.format(request.args['oniona'])+"messages", f))])
     if mcount != 0:
-        mcount = mcount/2
+        mcount = int(mcount/2)
     
     with open((KEY_FOLDER.format(str(request.args['oniona']))+"messages/"+str(int(mcount))+'signature.bin'), "wb+") as f:
         f.write(base64.b64decode(request.args['signature']))
@@ -54,6 +57,17 @@ def send_message():
     f.close()
 
     return "Thank you for your message!"
+
+@app.route('/signaturerequest', methods=["GET"])
+def signature_request():
+    if os.path.exists("signedsession.bin") == False:
+            return "No signed in session..."
+    
+    with open("./signedsession.bin", "rb") as f:
+        signature = base64.b64encode(f.read())
+    f.close()
+
+    return signature
 
 if __name__ == "__main__":
     app.run(port=8080, debug=False)

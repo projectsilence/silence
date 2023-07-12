@@ -21,7 +21,7 @@ else
 fi
 
 # Making the Flask project
-mkdir ./app
+mkdir ./app/backup
 python3 -m venv ./app/virtualenvironment
 source "./app/virtualenvironment/bin/activate"
 pip3 install gunicorn
@@ -29,19 +29,22 @@ pip3 install flask
 pip3 install requests
 pip3 install pycryptodome
 mkdir ./app/silence-backend
+mkdir ./app/silence_backend
 
 cp ./assets/*.py ./app/silence-backend
 
 cd ./app/silence-backend
 mkdir ./keys
 mkdir ./keys/self
+mkdir ./temp
+mkdir ./notifications.sil
 #gunicorn --bind 0.0.0.0:3301 wsgi:app
 
 deactivate
 
 pip3 install gunicorn
 pip3 install flask
-pip3 install requests
+pip3 install request
 pip3 install pycryptodome
 
 cd ../..
@@ -49,7 +52,6 @@ cd ../..
 mkdir backup
 cp /etc/tor/torrc ./backup
 cp ./setup-utils/torrc /etc/tor/torrc
-systemctl start tor
 systemctl restart tor
 cat /var/lib/tor/silence_service/hostname >> ./app/silence-backend/local_hostname.txt
 
