@@ -2,7 +2,9 @@ from flask import Flask, jsonify, request
 from settings import KEY_FOLDER, SELF_KEY_FOLDER, SELF_ADDRESS
 import base64, requests, os
 
-app = Flask(__name__)   
+app = Flask(__name__)
+
+base_folder = "keys"
 
 @app.route("/")
 def home():
@@ -13,11 +15,17 @@ def initiate():
     if 'pub1' not in request.args or 'pub2' not in request.args or 'init' not in request.args or 'oniona' not in request.args:
         return "Malformed request.."
 
-    if os.path.exists(request.args['oniona']) == True:
+    external_onion = request.args['oniona']
+    fullpath = os.path.normpath(KEY_FOLDER.format(external_onion))
+
+    if not fullpath.startswith(base_folder):
+        return "Nice try with URL injection."
+
+    if os.path.exists(fullpath) == True:
             return "Contact already initiated.."
 
-    os.mkdir(KEY_FOLDER.format(request.args['oniona']))
-    os.mkdir(KEY_FOLDER.format(request.args['oniona'])+"messages")
+    os.mkdir(fullpath)
+    os.mkdir(fullpath+"messages")
 
     if request.args['init'] == "1":
         rpub = request.args['pub1']
@@ -26,11 +34,11 @@ def initiate():
         rpub = request.args['pub2']
         fpub = request.args['pub1']
 
-    with open((KEY_FOLDER.format(str(request.args['oniona']))+'realpub.pub'), "wb+") as f:
+    with open(fullpath+'realpub.pub', "wb+") as f:
         f.write(base64.b64decode(rpub))
     f.close()
 
-    with open((KEY_FOLDER.format(str(request.args['oniona']))+'fakepub.pub'), "wb+") as f:
+    with open(fullpath+'fakepub.pub', "wb+") as f:
         f.write(base64.b64decode(fpub))
     f.close()
 
@@ -44,15 +52,21 @@ def send_message():
     if 'message' not in request.args or 'oniona' not in request.args or 'signature' not in request.args:
         return "Malformed request.."
     
-    mcount = len([f for f in os.listdir(KEY_FOLDER.format(request.args['oniona'])+"messages")if os.path.isfile(os.path.join(KEY_FOLDER.format(request.args['oniona'])+"messages", f))])
+    external_onion = request.args['oniona']
+    fullpath = os.path.normpath(KEY_FOLDER.format(external_onion))
+
+    if not fullpath.startswith(base_folder):
+        return "Nice try with URL injection."
+
+    mcount = len([f for f in os.listdir(fullpath+"messages")if os.path.isfile(os.path.join(fullpath+"messages", f))])
     if mcount != 0:
         mcount = int(mcount/2)
     
-    with open((KEY_FOLDER.format(str(request.args['oniona']))+"messages/"+str(int(mcount))+'signature.bin'), "wb+") as f:
+    with open((fullpath+"messages/"+str(int(mcount))+'signature.bin'), "wb+") as f:
         f.write(base64.b64decode(request.args['signature']))
     f.close()
 
-    with open((KEY_FOLDER.format(str(request.args['oniona']))+"messages/"+str(int(mcount))+'message.bin'), "wb+") as f:
+    with open((fullpath+"messages/"+str(int(mcount))+'message.bin'), "wb+") as f:
         f.write(base64.b64decode(request.args['message']))
     f.close()
 
