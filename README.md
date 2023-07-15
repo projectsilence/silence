@@ -6,7 +6,7 @@ The script is made to be as user-friendly as possible, it is encouraged to insta
 
 Local encryption laws may apply.  Please check and abide by the laws setout by your country.  Moral laws also apply, please use this service for good and do no harm.  I am not liable for your choices.
 
-Silence is still in an open beta, if you find any bugs or have any questions please contact me at finlay.business@proton.me
+Silence is still in an open beta, and is a proof of concept.  If you find any bugs or have any questions please contact me at finlay.business@proton.me
 
 Thank you.
 
