@@ -295,7 +295,7 @@ class Handler:
             print("Don't URL inject, not cool...")
             exit()
         else:
-            print("Unspecified error...)
+            print("Unspecified error...")
             exit()
 
     def readmessage(self):
