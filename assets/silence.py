@@ -123,8 +123,14 @@ class Handler:
         if cont == "Contact already initiated..":
             print("Connection should already be established..")
             exit()
-
-        print("Contact initiated, have a nice day!")     
+        elif cont == "Nice try with URL injection.":
+            print("Don't URL inject, not cool...")
+            exit()
+        elif cont == "Contact Initiated!":
+            print("Contact initiated, have a nice day!")
+            exit()
+        else:
+            print("Unspecified error")
 
     def pingtest(self):
         """Onion connection test"""
@@ -285,8 +291,11 @@ class Handler:
         elif content == "Malformed request..":
             print("Malformed request.  Did you brick the install?")
             exit()
+        elif content == "Nice try with URL injection.":
+            print("Don't URL inject, not cool...")
+            exit()
         else:
-            print("HOW?!")
+            print("Unspecified error...)
             exit()
 
     def readmessage(self):
