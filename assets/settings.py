@@ -20,5 +20,5 @@ TEMP_FOLDER = DEFAULT_TEMP_FOLDER # Change this if config is custom
 MESSAGES_KEPT = "FALSE" 
 MESSAGES_KEPT_FOR = 0 # Zero means forever, timing is not implemented yet
 
-SILENCE_CLIENT_USER_AGENT = "silenceCORE/0.6.9"
-SILENCE_SERVER_USER_AGENT = "silenceSERVER/0.6.9"
+SILENCE_CLIENT_USER_AGENT = "silenceCORE/0.2.1"
+SILENCE_SERVER_USER_AGENT = "silenceSERVER/0.2.1"
