@@ -75,11 +75,11 @@ $ ./install.sh
 # Locate the silence files
 $ cd app/silence-backend
 
-# Run silence daemon
-$ python3 silence.py daemon
-
 # Generate the silence keys
 $ python3 silence.py genkeys
+
+# Run silence daemon
+$ python3 silence.py daemon
 
 # Pingtest a silence onion to see if it's online
 $ python3 silence.py pingtest (onion)
