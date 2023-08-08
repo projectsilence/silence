@@ -286,6 +286,7 @@ class Handler:
 
         content = x.text
         if content == "Thank you for your message!":
+            os.remove("./temp/encrypted_data.bin")
             print("Message sent")
             exit()
         elif content == "Malformed request..":
