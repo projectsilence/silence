@@ -39,7 +39,7 @@ deactivate
 
 pip3 install gunicorn
 pip3 install flask
-pip3 install request
+pip3 install requests
 pip3 install pycryptodome
 
 cd $cwd
