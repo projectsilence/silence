@@ -4,7 +4,7 @@ server {
 
        location / {
          include proxy_params;
-         proxy_pass http://unix:/home/rootfinlay/silence/app/silence_backend/silence.sock;
+         proxy_pass http://unix:/usr/share/silence/silence.sock;
          allow 127.0.0.1;
          deny all;
        }

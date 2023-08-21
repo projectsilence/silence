@@ -4,11 +4,11 @@ Requires=silence.socket
 After=network.target
 
 [Service]
-User=rootfinlay
+User=silencedaemon
 Group=www-data
-WorkingDirectory=/home/rootfinlay/silence/app/silence-backend/
-Environment="PATH=/home/rootfinlay/silence/app/virtualenvironment/bin"
-ExecStart=/home/rootfinlay/silence/app/virtualenvironment/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/rootfinlay/silence/app/silence_backend/silence.sock wsgi:app
+WorkingDirectory=/usr/share/silence/
+Environment="PATH=/usr/share/silence/virtualenvironment/bin"
+ExecStart=/usr/share/silence/virtualenvironment/bin/gunicorn --access-logfile - --workers 3 --bind unix:/usr/share/silence/silence.sock wsgi:app
 
 [Install]
 WantedBy=multi-user.target

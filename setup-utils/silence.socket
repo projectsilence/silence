@@ -2,7 +2,7 @@
 Description=silence socket
 
 [Socket]
-ListenStream=/home/rootfinlay/silence/app/silence_backend/silence.sock
+ListenStream=/usr/share/silence/silence.sock
 
 [Install]
 WantedBy=sockets.target

@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, request
-from settings import KEY_FOLDER, SELF_KEY_FOLDER, SELF_ADDRESS
+from settings import KEY_FOLDER, SELF_KEY_FOLDER, SELF_ADDRESS, BASE_DIR
 import base64, requests, os
 
 app = Flask(__name__)
 
-base_folder = "keys"
+base_folder = BASE_DIR
 
 @app.route("/")
 def home():
@@ -25,7 +25,7 @@ def initiate():
             return "Contact already initiated.."
 
     os.mkdir(fullpath)
-    os.mkdir(fullpath+"messages")
+    os.mkdir(fullpath+"/messages")
 
     if request.args['init'] == "1":
         rpub = request.args['pub1']
@@ -33,17 +33,21 @@ def initiate():
     elif request.args['init'] == "2":
         rpub = request.args['pub2']
         fpub = request.args['pub1']
+    else:
+        return "Invalid realkey"
 
-    with open(fullpath+'realpub.pub', "wb+") as f:
+    with open(fullpath+'/realpub.pub', "wb+") as f:
         f.write(base64.b64decode(rpub))
     f.close()
 
-    with open(fullpath+'fakepub.pub', "wb+") as f:
+    with open(fullpath+'/fakepub.pub', "wb+") as f:
         f.write(base64.b64decode(fpub))
     f.close()
 
-    with open("./notifications.sil", "a") as f:
+    with open(BASE_DIR+"/notifications.sil", "a") as f:
         f.write("New contact:  {}".format(request.args['oniona']))
+
+    os.chmod(fullpath, 0o777)
 
     return "Contact Initiated!"
 
@@ -58,26 +62,34 @@ def send_message():
     if not fullpath.startswith(base_folder):
         return "Nice try with URL injection."
 
-    mcount = len([f for f in os.listdir(fullpath+"messages")if os.path.isfile(os.path.join(fullpath+"messages", f))])
+    if os.path.exists(fullpath+"/messages") == False:
+        os.mkdir(fullpath+"/messages")
+
+    mcount = len([f for f in os.listdir(fullpath+"/messages")if os.path.isfile(os.path.join(fullpath+"/messages", f))])
     if mcount != 0:
         mcount = int(mcount/2)
     
-    with open((fullpath+"messages/"+str(int(mcount))+'signature.bin'), "wb+") as f:
+    with open((fullpath+"/messages/"+str(int(mcount))+'signature.bin'), "wb+") as f:
         f.write(base64.b64decode(request.args['signature']))
     f.close()
+    os.chmod(fullpath+"/messages/"+str(int(mcount))+'signature.bin', 0o777)
 
-    with open((fullpath+"messages/"+str(int(mcount))+'message.bin'), "wb+") as f:
+    with open((fullpath+"/messages/"+str(int(mcount))+'message.bin'), "wb+") as f:
         f.write(base64.b64decode(request.args['message']))
     f.close()
+    os.chmod(fullpath+"/messages/"+str(int(mcount))+'message.bin', 0o777)
+    
+    os.chmod(fullpath, 0o777)
+    os.chmod(fullpath+"/messages", 0o777)
 
     return "Thank you for your message!"
 
 @app.route('/signaturerequest', methods=["GET"])
 def signature_request():
-    if os.path.exists("signedsession.bin") == False:
+    if os.path.exists(BASE_DIR+"/signedsession.bin") == False:
             return "No signed in session..."
     
-    with open("./signedsession.bin", "rb") as f:
+    with open(BASE_DIR+"/signedsession.bin", "rb") as f:
         signature = base64.b64encode(f.read())
     f.close()
 

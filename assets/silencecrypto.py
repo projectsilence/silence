@@ -8,7 +8,7 @@ from Crypto.Signature import pkcs1_15
 from Crypto.Hash import SHA512
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
-from settings import KEY_FOLDER, SELF_KEY_FOLDER, TEMP_FOLDER, SELF_KEY_ONE, SELF_KEY_TWO
+from settings import KEY_FOLDER, SELF_KEY_FOLDER, TEMP_FOLDER, SELF_KEY_ONE, SELF_KEY_TWO, BASE_DIR
 import base64
 
 def GenerateKeypairRSA(passphrase, name):

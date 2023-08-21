@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
  silence.py
  pretty private messaging service :D
@@ -9,7 +10,9 @@
  Cicada3301 - Inspiration.  May emergence be upon us.
 '''
 
-import argparse, requests, os, base64, json, datetime
+import argparse, requests, os, base64, json, datetime, shutil
+import sys
+sys.path.append('/usr/share/silence') # Silence path
 import settings
 import silencecrypto
 
@@ -23,6 +26,7 @@ class Handler:
         self.MESSAGES_KEPT = settings.MESSAGES_KEPT
         self.SELF_KEY_ONE = settings.SELF_KEY_ONE
         self.SELF_KEY_TWO = settings.SELF_KEY_TWO
+        self.BASE_DIR = settings.BASE_DIR
 
     def handle(self):
         """Interpret the first command line argument, and redirect."""
@@ -39,10 +43,12 @@ class Handler:
         action()
 
     def daemon(self):
-        os.system('sudo systemctl start nginx')
-        os.system('sudo systemctl start tor')
-        os.system('sudo systemctl start silence.service')
-
+        if os.path.exists(self.BASE_DIR+"/signedsession.bin") == True:
+            os.remove(self.BASE_DIR+"/signedsession.bin")
+        
+        if os.path.exists(self.SELF_KEY_ONE+".bin") == False or os.path.exists(self.SELF_KEY_ONE+".pub") == False or os.path.exists(self.SELF_KEY_TWO+".bin") == False or os.path.exists(self.SELF_KEY_ONE+".pub") == False:
+            print("Please create keys first (silence genkeys)...")
+            exit()
 
         print("Please sign the session.  Remember, this signed session will be sent to users sending you a message.")
         pass1 = input("Please input the private key password (1/2):\n> ")
@@ -62,8 +68,12 @@ class Handler:
             keystate = self.SELF_KEY_ONE
 
         signature = silencecrypto.SessionSigning(password=pass1, keystate=keystate)
-        with open("./signedsession.bin", "wb+") as f:
+        with open(self.BASE_DIR+"/signedsession.bin", "wb+") as f:
             f.write(signature)
+
+        os.system('sudo systemctl start nginx')
+        os.system('sudo systemctl start tor')
+        os.system('sudo systemctl start silence.service')
 
         print("[ Silence ] - Silence Services started..")
 
@@ -72,8 +82,8 @@ class Handler:
         os.system('sudo systemctl stop tor')
         os.system('sudo systemctl stop silence.service')
 
-        if os.path.exists("signedsession.bin") == True:
-            os.system("rm -f signedsession.bin")
+        if os.path.exists(self.BASE_DIR+"/signedsession.bin") == True:
+            os.remove(self.BASE_DIR+"/signedsession.bin")
 
         print("[ Silence ] - Silence Services stopped..")
 
@@ -92,12 +102,14 @@ class Handler:
 
         external_onion = ' '.join(args.external_onion).replace("\n", " ").replace("\r", "")
         
-        if os.path.exists("signedsession.bin") == False:
+        if os.path.exists(self.BASE_DIR+"/signedsession.bin") == False:
             print("Please start the daemon first...")
             exit()
 
         print("Please be aware that your signed session will be sent to sending a message, choose keys accordingly..")
-        realkey = input("Please specify if key 1 or key 2 is to be the real key:\n> ")
+        realkey = input("Please specify if key (1) or key (2) is to be the real key:\n> ")
+        if realkey != "1" and realkey != "2":
+            print("Please choose 1 or 2.  No other characters will be accepted..")
 
         pub1 = base64.b64encode(open(self.SELF_KEY_ONE+".pub", "rb").read())
         pub2 = base64.b64encode(open(self.SELF_KEY_TWO+".pub", "rb").read())
@@ -126,11 +138,11 @@ class Handler:
         elif cont == "Nice try with URL injection.":
             print("Don't URL inject, not cool...")
             exit()
-        elif cont == "Contact Initiated!":
-            print("Contact initiated, have a nice day!")
+        elif cont == "Invalid realkey":
+            print("Invalid realkey, choose 1 or 2")
             exit()
-        else:
-            print("Unspecified error")
+
+        print("Contact initiated, have a nice day!")     
 
     def pingtest(self):
         """Onion connection test"""
@@ -141,7 +153,7 @@ class Handler:
 
         external_onion = ' '.join(args.external_onion).replace("\n", " ").replace("\r", "")
 
-        if os.path.exists("signedsession.bin") == False:
+        if os.path.exists(self.BASE_DIR+"/signedsession.bin") == False:
             print("Please start the daemon first...")
             exit()
 
@@ -166,14 +178,10 @@ class Handler:
 
     def genkeys(self):
         """Generates crypto keys"""
-        if os.path.exists("signedsession.bin") == False:
-            print("Please start the daemon first...")
-            exit()
-        
-        choice = input("If you wish to use custom keynames, please edit the settings.py file.  Do you want to continue? (y/n):\n> ")
-        if choice == "y":
+        choice = input("If you wish to use custom keynames, please edit the settings.py file.  Do you want to continue? Choose n if you are yet to change keynames (y/n):\n> ")
+        if choice == "y" or choice == "Y":
             pass
-        elif choice == "n":
+        elif choice == "n" or choice == "N":
             print("Please edit the settings.py file and run again.")
             exit()
         else:
@@ -196,7 +204,7 @@ class Handler:
 
         external_onion = ' '.join(args.external_onion).replace("\n", " ").replace("\r", "")
 
-        if os.path.exists("signedsession.bin") == False:
+        if os.path.exists(self.BASE_DIR+"/signedsession.bin") == False:
             print("Please start the daemon first...")
             exit()
 
@@ -286,7 +294,6 @@ class Handler:
 
         content = x.text
         if content == "Thank you for your message!":
-            os.remove("./temp/encrypted_data.bin")
             print("Message sent")
             exit()
         elif content == "Malformed request..":
@@ -296,7 +303,7 @@ class Handler:
             print("Don't URL inject, not cool...")
             exit()
         else:
-            print("Unspecified error...")
+            print("HOW?!")
             exit()
 
     def readmessage(self):
@@ -311,6 +318,9 @@ class Handler:
         if os.path.exists(self.KEY_FOLDER.format(external_onion)) == False:
             print("External keys not found...  Please initiate contact or check config..")
             exit()
+        if os.path.exists(self.KEY_FOLDER.format(external_onion)+"/messages") == False:
+            print("No new messages")
+            exit()
 
         pass1 = input("Please input the private key password (1/2):\n> ")
         pass2 = input("Please input the private key password (2/2):\n> ")
@@ -319,7 +329,7 @@ class Handler:
             print("Passwords do not match..")
             exit()
 
-        signatureb = base64.b64encode(open("./signedsession.bin", "rb").read())
+        signatureb = base64.b64encode(open(self.BASE_DIR+"/signedsession.bin", "rb").read())
         keyunlocked = silencecrypto.SelfSessionCheck(signatureb)
 
         if keyunlocked == "Key1":
@@ -363,8 +373,7 @@ class Handler:
         if self.MESSAGES_KEPT == "TRUE":
             exit()
         elif self.MESSAGES_KEPT == "FALSE":
-            os.system('rm -rf {}'.format(self.KEY_FOLDER.format(external_onion)+"messages"))
-            os.mkdir(self.KEY_FOLDER.format(external_onion)+"messages")
+            shutil.rmtree(self.KEY_FOLDER.format(external_onion)+"messages")
             exit()
 
 if __name__ == "__main__":
