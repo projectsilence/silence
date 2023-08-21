@@ -44,8 +44,10 @@ def initiate():
         f.write(base64.b64decode(fpub))
     f.close()
 
+    '''
     with open(BASE_DIR+"/notifications.sil", "a") as f:
         f.write("New contact:  {}".format(request.args['oniona']))
+    '''
 
     os.chmod(fullpath, 0o777)
 
