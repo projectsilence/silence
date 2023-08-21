@@ -11,8 +11,5 @@ sudo cp ./backup/torrc /etc/tor/torrc
 
 sudo userdel silencedaemon
 
-sudo chmod +x specifc.sh
-sudo ./specific.sh
-
 sudo rm -rf /usr/share/silence
 sudo rm -rf /usr/bin/silence
