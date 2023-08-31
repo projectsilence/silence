@@ -45,13 +45,13 @@ pip3 install pycryptodome
 cd $cwd
 
 useradd --system -g www-data --no-create-home --home-dir=/usr/share/silence --shell=/usr/sbin/nologin silencedaemon
-chown -R silencedaemon:www-data /usr/share/silence
 # Tor setup
 mkdir backup
 cp /etc/tor/torrc ./backup
 cp ./setup-utils/torrc /etc/tor/torrc
 systemctl restart tor
 cat /var/lib/tor/silence_service/hostname >> /usr/share/silence/local_hostname.txt
+chown -R silencedaemon:www-data /usr/share/silence
 
 # silence service setup
 cp ./setup-utils/silence.socket /etc/systemd/system/silence.socket
