@@ -20,6 +20,7 @@ pip3 install gunicorn
 pip3 install flask
 pip3 install requests
 pip3 install pycryptodome
+pip3 install pysocks
 
 cp ./assets/silencecrypto.py /usr/share/silence
 cp ./assets/settings.py /usr/share/silence
@@ -41,6 +42,7 @@ pip3 install gunicorn
 pip3 install flask
 pip3 install requests
 pip3 install pycryptodome
+pip3 install pysocks
 
 cd $cwd
 
