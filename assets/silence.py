@@ -27,6 +27,7 @@ class Handler:
         self.SELF_KEY_ONE = settings.SELF_KEY_ONE
         self.SELF_KEY_TWO = settings.SELF_KEY_TWO
         self.BASE_DIR = settings.BASE_DIR
+        self.USERNAME = settings.USERNAME
 
     def handle(self):
         """Interpret the first command line argument, and redirect."""
@@ -102,9 +103,34 @@ class Handler:
 
         external_onion = ' '.join(args.external_onion).replace("\n", " ").replace("\r", "")
         
+        if external_onion == "SILENCE_USER":
+            print("External user does not have a username set, please use their onion address")
+            exit()
+
+        if self.USERNAME == "SILENCE_USER":
+            print("No username set, please edit the Silence settings file.")
+            exit()
+
         if os.path.exists(self.BASE_DIR+"/signedsession.bin") == False:
             print("Please start the daemon first...")
             exit()
+
+        '''
+        f = open(self.BASE_DIR+"/contacts.sil", "r+")
+        tempvar = 0
+        for line in f:
+            useronion = line.split(":")
+            if useronion[0] == external_onion:
+                tempvar = 1
+            elif useronion[1] == external_onion:
+                external_onion = useronion[0]
+                tempvar = 1
+        f.close()
+
+        if tempvar == 0:
+            print("Contact not found...  Please make sure they have initiated contact with you.")
+            exit()
+        '''
 
         print("Please be aware that your signed session will be sent to sending a message, choose keys accordingly..")
         realkey = input("Please specify if key (1) or key (2) is to be the real key:\n> ")
@@ -118,7 +144,8 @@ class Handler:
             'pub1' : pub1,
             'pub2' : pub2,
             'init' : realkey,
-            'oniona' : self.SELF_ADDRESS
+            'oniona' : self.SELF_ADDRESS,
+            'uname' : self.USERNAME,
         }
 
         session = requests.session()
@@ -157,6 +184,21 @@ class Handler:
             print("Please start the daemon first...")
             exit()
 
+        f = open(self.BASE_DIR+"/contacts.sil", "r+")
+        tempvar = 0
+        for line in f:
+            useronion = line.split(":")
+            if useronion[0] == external_onion:
+                tempvar = 1
+            elif useronion[1] == external_onion:
+                external_onion = useronion[0]
+                tempvar = 1
+        f.close()
+
+        if tempvar == 0:
+            print("Contact not found...  Please make sure they have initiated contact with you.")
+            exit()
+
         session = requests.session()
         session.proxies = {}
         session.proxies['http'] = 'socks5h://localhost:9050'
@@ -188,6 +230,10 @@ class Handler:
             print("Invalid choice.  y or n only.")
             exit()
         
+        if self.USERNAME == "SILENCE_USER":
+            print("No username set, please edit the Silence settings file.")
+            exit()
+
         passphrase1 = input("Please input a passphrase for the first key:\n> ")
         silencecrypto.GenerateKeypairRSA(passphrase1, name=self.SELF_KEY_ONE)
 
@@ -206,6 +252,21 @@ class Handler:
 
         if os.path.exists(self.BASE_DIR+"/signedsession.bin") == False:
             print("Please start the daemon first...")
+            exit()
+
+        f = open(self.BASE_DIR+"/contacts.sil", "r+")
+        tempvar = 0
+        for line in f:
+            useronion = line.split(":")
+            if useronion[0] == external_onion:
+                tempvar = 1
+            elif useronion[1] == external_onion:
+                external_onion = useronion[0]
+                tempvar = 1
+        f.close()
+
+        if tempvar == 0:
+            print("Contact not found...  Please make sure they have initiated contact with you.")
             exit()
 
         if os.path.exists(self.KEY_FOLDER.format(external_onion)) == False:
@@ -314,6 +375,21 @@ class Handler:
         args = parser.parse_args()
 
         external_onion = ' '.join(args.external_onion).replace("\n", " ").replace("\r", "")
+
+        f = open(self.BASE_DIR+"/contacts.sil", "r+")
+        tempvar = 0
+        for line in f:
+            useronion = line.split(":")
+            if useronion[0] == external_onion:
+                tempvar = 1
+            elif useronion[1] == external_onion:
+                external_onion = useronion[0]
+                tempvar = 1
+        f.close()
+
+        if tempvar == 0:
+            print("Contact not found...  Please make sure they have initiated contact with you.")
+            exit()
 
         if os.path.exists(self.KEY_FOLDER.format(external_onion)) == False:
             print("External keys not found...  Please initiate contact or check config..")

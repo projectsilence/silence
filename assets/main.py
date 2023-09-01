@@ -12,7 +12,7 @@ def home():
 
 @app.route("/initiate", methods=["POST"])
 def initiate():
-    if 'pub1' not in request.args or 'pub2' not in request.args or 'init' not in request.args or 'oniona' not in request.args:
+    if 'pub1' not in request.args or 'pub2' not in request.args or 'init' not in request.args or 'oniona' not in request.args or 'uname' not in request.args:
         return "Malformed request.."
 
     external_onion = request.args['oniona']
@@ -28,11 +28,11 @@ def initiate():
     os.mkdir(fullpath+"/messages")
 
     if request.args['init'] == "1":
-        rpub = request.args['pub1']
-        fpub = request.args['pub2']
+        rpub = request.args['pub1'].strip("\n")
+        fpub = request.args['pub2'].strip("\n")
     elif request.args['init'] == "2":
-        rpub = request.args['pub2']
-        fpub = request.args['pub1']
+        rpub = request.args['pub2'].strip("\n")
+        fpub = request.args['pub1'].strip("\n")
     else:
         return "Invalid realkey"
 
@@ -44,10 +44,11 @@ def initiate():
         f.write(base64.b64decode(fpub))
     f.close()
 
-    '''
+    with open(BASE_DIR+"/contacts.sil", "a+") as f:
+        f.write(request.args['oniona'].strip("\n")+":"+request.args['uname'].replace(":", "").strip("\n"))
+
     with open(BASE_DIR+"/notifications.sil", "a") as f:
-        f.write("New contact:  {}".format(request.args['oniona']))
-    '''
+        f.write("New contact:  onion={}, username={}".format(request.args['oniona'].strip("\n"), request.args['uname'].replace(":", "").strip("\n")))
 
     os.chmod(fullpath, 0o777)
 

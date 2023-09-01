@@ -7,5 +7,5 @@ server {
          proxy_pass http://unix:/usr/share/silence/silence.sock;
          allow 127.0.0.1;
          deny all;
-       }
-     }
+      }
+    }

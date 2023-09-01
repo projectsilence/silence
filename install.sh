@@ -32,7 +32,8 @@ cd /usr/share/silence
 mkdir ./keys
 mkdir ./keys/self
 mkdir ./temp
-mkdir ./notifications.sil
+touch ./notifications.sil
+touch ./contacts.sil
 chmod 777 -R /usr/share/silence
 #gunicorn --bind 0.0.0.0:3301 wsgi:app
 
@@ -74,5 +75,11 @@ systemctl stop nginx
 chmod +x /usr/bin/silence
 
 printf "[ Silence Setup ]: DONE \n"
+printf "\n"
+printf "PLEASE RESTART FOR DAEMON TO WORK EFFECTIVELY!!!\n"
+printf "PLEASE RESTART FOR DAEMON TO WORK EFFECTIVELY!!!\n"
+printf "PLEASE RESTART FOR DAEMON TO WORK EFFECTIVELY!!!\n"
+printf "PLEASE RESTART FOR DAEMON TO WORK EFFECTIVELY!!!\n"
+printf "PLEASE RESTART FOR DAEMON TO WORK EFFECTIVELY!!!\n"
 
 # 1033
