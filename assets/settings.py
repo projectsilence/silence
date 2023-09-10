@@ -5,6 +5,7 @@
 ####################################
 
 BASE_DIR = "/usr/share/silence"
+USERNAME = open(f"{BASE_DIR}/username.txt", "r").read().strip("\n") # Should not contain the : character
 
 SELF_ADDRESS = open(f"{BASE_DIR}/local_hostname.txt", "r").read().strip("\n")
 
@@ -24,5 +25,3 @@ MESSAGES_KEPT_FOR = 0 # Zero means forever, timing is not implemented yet
 
 SILENCE_CLIENT_USER_AGENT = "silenceCORE/0.4.0"
 SILENCE_SERVER_USER_AGENT = "silenceSERVER/0.4.0"
-
-USERNAME = "SILENCE_USER" # Should not contain the : character

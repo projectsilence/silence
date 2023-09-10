@@ -11,8 +11,11 @@ fi
 
 cwd=$(pwd)
 
+read -p "Enter a username for your Silence installation: " my_var 
+
 # Making the Flask project
 mkdir /usr/share/silence
+echo $my_var >> /usr/share/silence/username.txt
 mkdir /usr/share/silence/backup
 python3 -m venv /usr/share/silence/virtualenvironment
 source "/usr/share/silence/virtualenvironment/bin/activate"
