@@ -10,6 +10,7 @@ Silence is still in an open beta, and is a proof of concept. If you find any bug
 Thank you.
 
 ## Installation & Running Silence
+Silence has been tested on:  Parrot OS, Quebes OS, Linux Mint, Kali Linux
 ```console
 
 # Clone the repo
